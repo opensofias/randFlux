@@ -7,12 +7,12 @@ const noDebt = (gen, {population}) => {
 		gen [floor (random () * population)] ++
 }}
 
-const noDebtNoRich = (gen, {population, startCapital}) => {
+const noDebtWealthCaps = ({minWeatlh, maxWealth}) => (gen, {population, startCapital}) => {
 	const sender = floor (random () * population)
 	const reciever = floor (random () * population)
 	if (
-		gen [sender] > 0 &&
-		gen [reciever] < startCapital * 2
+		gen [sender] > minWeatlh &&
+		gen [reciever] < maxWealth
 	) {
 		gen [sender] --
 		gen [reciever] ++
@@ -60,6 +60,9 @@ const noDebtCompareWealth = (ifPoorer, ifRicher) => (gen, {population}) => {
 	}
 }
 
+/*
+TODO: distribution scheme based on 'class'. that is, wether one has above or below average wealth.
+
 const noDebtClassBased = (poor2poor, poor2rich, rich2poor, rich2rich) => (gen, {population}) => {
 	const sender = floor (random () * population)
 	const reciever = floor (random () * population)
@@ -76,6 +79,7 @@ const noDebtClassBased = (poor2poor, poor2rich, rich2poor, rich2rich) => (gen, {
 		gen [reciever] += richer
 	}
 }
+*/
 
 const richReset = (gen, {population, startCapital}) => {
 	const sender = floor (random () * population)
