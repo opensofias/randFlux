@@ -1,25 +1,40 @@
 'use strict'
 
 const fluxDefault = {
-	steps: 2 ** 18,
+	steps: 2 ** 16,
 	generations: 2 ** 6,
-	population: 2 ** 8,
+	populationSize: 2 ** 8,
 	startCapital: 2 ** 8,
-	scheme: noDebt
+	scheme: normal,
+
+	/* optional */
+	minWealth: 0,
+	maxWealth: Number.POSITIVE_INFINITY,
+
+	/* for compareWealth */ 
+	ifPoorer: 2, ifRicher: 1,
+
+	/* for classBased */
+	poor2poor: 1, poor2rich: 1,
+	rich2poor: 2, rich2rich: 1,
 }
 
 const runFlux = (config) => {
-	const {steps, generations, population, startCapital, scheme} = config
-	const fluxHist = [population .map (()=> startCapital)]
+	const {steps, generations, populationSize, startCapital, scheme} = config
+	const fluxHist = [populationSize .map (()=> startCapital)]
+
+	/*const fluxHist = [populationSize .map (()=> 0)] // start from maximally unequal position instead
+	fluxHist [0][0] = startCapital*/
+
 	let counter = 0
 
 	generations.forEach (_=> {
-		const currentGen = [...fluxHist [fluxHist.length - 1]]
+		const currentGeneration = [...fluxHist [fluxHist.length - 1]]
 		steps.forEach (_=> {
 			counter ++
-			scheme (currentGen, config, counter)
+			scheme (config, currentGeneration, counter)
 		})
-		fluxHist.push(currentGen)
+		fluxHist.push(currentGeneration)
 	})
 	fluxHist.forEach (time => {
 		/*d.body.appendChild (barChart (time, {min: 0}))*/

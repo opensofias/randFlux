@@ -1,133 +1,103 @@
 'use strict'
 
-const noDebt = (gen, {population}) => {
-	const sender = floor (random () * population)
-	if (gen [sender] > 0) {
-		gen [sender] --
-		gen [floor (random () * population)] ++
-}}
-
-const noDebtWealthCaps = ({minWeatlh, maxWealth}) => (gen, {population, startCapital}) => {
-	const sender = floor (random () * population)
-	const reciever = floor (random () * population)
-	if (
-		gen [sender] > minWeatlh &&
-		gen [reciever] < maxWealth
-	) {
-		gen [sender] --
-		gen [reciever] ++
-	}
+const transfer = ({
+		population,
+		minWeatlh = 0,
+		maxWealth = Number.POSITIVE_INFINITY
+	}) => (sender, receiver, amount = 1) => {
+		if (
+			population [sender] - amount >= minWeatlh &&
+			population [receiver] + amount <= maxWealth
+		) {
+			population [sender] -= amount
+			population [receiver] += amount
+		}
 }
 
-const noDebtUBI = (gen, {population, startCapital}, counter) => {
-	const sender = floor (random () * population)
-	if (gen [sender] > 0) {
-		gen [sender] --
-		gen [floor (random () * population)] ++
-	}
+const normal = (config, population) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	transfer ({population, __proto__ : config}) (sender, receiver, config.transferAmount)
+}
+
+const compareWealth = (config, population) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	const {ifPoorer = 1, ifRicher = 2} = config
+	transfer ({population, __proto__ : config}) (
+		sender, receiver,
+		population [sender] <= population [receiver] ?
+		ifPoorer : ifRicher
+	)
+}
+
+const classBased = (config, population) => {
+	const {
+		poor2poor = 2, poor2rich = 1,
+		rich2poor = 3, rich2rich = 2,
+		startCapital
+	} = config
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	transfer ({population, __proto__ : config}) (
+		sender, receiver,
+		[poor2poor, poor2rich, rich2poor, rich2rich] [
+			(population [receiver] > startCapital ? 1 : 0) +
+			(population [sender] > startCapital ? 2 : 0)
+		]
+	)
+}
+
+/* TODO: seperate out redistribution schemes */
+
+const normalWithUBI = (config, population, counter) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	transfer ({population, __proto__ : config}) (sender, receiver, config.transferAmount)
+
 	if (! (counter % 1024)) {
-		gen.forEach ((money, index) => 
-			gen[index] = round (money * (1 - 1 / 2 ** 10) + startCapital / 2 ** 10))
-	}
-}
-
-const noDebtUBO = (gen, {population, startCapital}, counter) => {
-	const sender = floor (random () * population)
-	if (gen [sender] > 0) {
-		gen [sender] --
-		gen [floor (random () * population)] ++
-	}
-	if (! (counter % 1024)) {
-		gen.forEach ((money, index) => 
-			gen[index] = max (0, round (money * (1 + 1 / 128) - startCapital / 128)))
-	}
-}
-
-const noDebtCompareWealth = (ifPoorer, ifRicher) => (gen, {population}) => {
-	const sender = floor (random () * population)
-	const reciever = floor (random () * population)
-	if (
-		gen [sender] - poorer >= 0 &&
-		gen [sender] <= gen [reciever]
-	) {
-		gen [sender] -= poorer
-		gen [reciever] += poorer
-	} else if (
-		gen [sender] - richer >= 0
-	) {
-		gen [sender] -= richer
-		gen [reciever] += richer
+		population.forEach ((money, index) => 
+			population[index] = round (money * (1 - 1 / 2 ** 10) + config.startCapital / 2 ** 10))
 	}
 }
 
 /*
-TODO: distribution scheme based on 'class'. that is, wether one has above or below average wealth.
-
-const noDebtClassBased = (poor2poor, poor2rich, rich2poor, rich2rich) => (gen, {population}) => {
+const richReset = (population, {population, startCapital}) => {
 	const sender = floor (random () * population)
-	const reciever = floor (random () * population)
+	const receiver = floor (random () * population)
 	if (
-		gen [sender] - poorer >= 0 &&
-		gen [sender] <= gen [reciever]
+		population [sender] > 0
 	) {
-		gen [sender] -= poorer
-		gen [reciever] += poorer
-	} else if (
-		gen [sender] - richer >= 0
-	) {
-		gen [sender] -= richer
-		gen [reciever] += richer
+		population [sender] --
+		population [receiver] ++
+	if (population[sender] == 0) {
+		const sorted = population.slice(0).sort((a, b) => b - a);
+		population[population.indexOf(sorted[0])] -= startCapital;
+		population[sender] += startCapital;
 	}
-}
+}}
+
+const noDebtLocal = (population, {population}) => {
+	const sender = floor (random () * population)
+	if (population [sender] > 0) {
+		population [sender] --
+		population [mod (
+			sender + floor (random () * 3) - 1, population
+		)] ++
+}}
+
+const noDebtLocalSort = (population, {population}) => {
+	const sender = floor (random () * population)
+	if (population [sender] > 0) {
+		population [sender] --
+		population [mod (
+			sender + floor (random () * 3) - 1, population
+		)] ++
+		population = population.sort ((x, y) => y - x)
+}}
+
 */
-
-const richReset = (gen, {population, startCapital}) => {
-	const sender = floor (random () * population)
-	const reciever = floor (random () * population)
-	if (
-		gen [sender] > 0
-	) {
-		gen [sender] --
-		gen [reciever] ++
-	if (gen[sender] == 0) {
-		const sorted = gen.slice(0).sort((a, b) => b - a);
-		gen[gen.indexOf(sorted[0])] -= startCapital;
-		gen[sender] += startCapital;
-	}
-}}
-
-const richResetFeedTheRich = (gen, {population, startCapital}) => {
-	const sender = floor (random () * population)
-	const reciever = floor (random () * population)
-	if (
-		gen [sender] > 0 &&
-		gen [sender] <= gen [reciever]
-	) {
-		gen [sender] --
-		gen [reciever] ++
-    
-	if (gen[sender] == 0) {
-		const sorted = gen.slice(0).sort((a, b) => b - a);
-		gen[gen.indexOf(sorted[0])] -= startCapital;
-		gen[sender] += startCapital;
-	}
-}}
-
-const noDebtLocal = (gen, {population}) => {
-	const sender = floor (random () * population)
-	if (gen [sender] > 0) {
-		gen [sender] --
-		gen [mod (
-			sender + floor (random () * 3) - 1, population
-		)] ++
-}}
-
-const noDebtLocalSort = (gen, {population}) => {
-	const sender = floor (random () * population)
-	if (gen [sender] > 0) {
-		gen [sender] --
-		gen [mod (
-			sender + floor (random () * 3) - 1, population
-		)] ++
-		gen = gen.sort ((x, y) => y - x)
-}}
