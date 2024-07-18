@@ -65,6 +65,30 @@ const normalWithUBI = (config, population, counter) => {
 	}
 }
 
+const jardGamblingMin = (config, population) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	const wager = Math.min (population [sender] * .1, population [receiver] * .1)
+	transfer ({population, __proto__ : config}) (sender, receiver, wager)
+}
+
+const jardGamblingMax = (config, population) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	const wager = Math.max (population [sender] * .1, population [receiver] * .1)
+	transfer ({population, __proto__ : config}) (sender, receiver, wager)
+}
+
+const jardGamblingAvg = (config, population) => {
+	const [sender, receiver] = 2 .map (
+		() => floor (random () * config.populationSize)
+	)
+	const wager = population [sender] * .5 + population [receiver] * .5
+	transfer ({population, __proto__ : config}) (sender, receiver, wager)
+}
+
 /*
 const richReset = (population, {population, startCapital}) => {
 	const sender = floor (random () * population)
