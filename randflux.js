@@ -46,5 +46,3 @@ const runFlux = (config) => {
 		)
 	})
 }
-
-onload = ()=> runFlux (fluxDefault)
