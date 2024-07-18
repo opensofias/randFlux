@@ -1,10 +1,10 @@
 'use strict'
 
 const fluxDefault = {
-	steps: 2 ** 16,
+	steps: 2 ** 14,
 	generations: 2 ** 6,
 	populationSize: 2 ** 8,
-	startCapital: 2 ** 8,
+	startCapital: 2 ** 5,
 	scheme: normal,
 
 	/* optional */
