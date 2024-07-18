@@ -69,7 +69,7 @@ const yardGamblingMin = (config, population) => {
 	const [sender, receiver] = 2 .map (
 		() => floor (random () * config.populationSize)
 	)
-	const wager = Math.min (population [sender] * .1, population [receiver] * .1)
+	const wager = Math.min (population [sender], population [receiver]) * config.gambleRate
 	transfer ({population, __proto__ : config}) (sender, receiver, wager)
 }
 
@@ -77,7 +77,7 @@ const yardGamblingMax = (config, population) => {
 	const [sender, receiver] = 2 .map (
 		() => floor (random () * config.populationSize)
 	)
-	const wager = Math.max (population [sender] * .1, population [receiver] * .1)
+	const wager = Math.max (population [sender], population [receiver]) * config.gambleRate
 	transfer ({population, __proto__ : config}) (sender, receiver, wager)
 }
 
@@ -85,7 +85,7 @@ const yardGamblingAvg = (config, population) => {
 	const [sender, receiver] = 2 .map (
 		() => floor (random () * config.populationSize)
 	)
-	const wager = population [sender] * .5 + population [receiver] * .5
+	const wager = (population [sender] + population [receiver]) / 2 * config.gambleRate
 	transfer ({population, __proto__ : config}) (sender, receiver, wager)
 }
 

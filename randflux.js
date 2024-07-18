@@ -17,6 +17,9 @@ const fluxDefault = {
 	/* for classBased */
 	poor2poor: 1, poor2rich: 1,
 	rich2poor: 2, rich2rich: 1,
+
+	/* for yardGabling */
+	gambleRate: 2 ** -4
 }
 
 const runFlux = (config) => {
